@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator trpc {
+    provider        = "prisma-trpc-generator"
+    withMiddleware  = true
+    withShield      = false
+    contextPath     = "../src/context"
+    trpcOptionsPath = "../src/trpcOptions"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Track {
+    id        String   @id @default(cuid())
+    title     String
+    duration  Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Album     Album?   @relation(fields: [albumId], references: [id])
+    albumId   String?
+}
+
+model Album {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    tracks    Track[]
+    Artist    Artist?  @relation(fields: [artistId], references: [id])
+    artistId  String?
+}
+
+model Artist {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    album     Album[]
+    Genre     Genre?   @relation(fields: [genreId], references: [id])
+    genreId   String?
+}
+
+model Genre {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    artist    Artist[]
+}
